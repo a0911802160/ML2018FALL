@@ -2,8 +2,8 @@ import numpy as np
 import math
 import random
 import os
-import matplotlib.pyplot as plt
 import pandas as pd
+import sys
 
 train_x_file, train_y_file, test_x_file, output_file = sys.argv[
     1], sys.argv[2], sys.argv[3], sys.argv[4]

@@ -82,8 +82,10 @@ for idx in range(5, 11):
     train_set_X = one_hot_encoding(train_set_X, idx, 11, -2)
     test_set_X = one_hot_encoding(test_set_X, idx, 11, -2)
 
-train_set_X = np.delete(train_set_X, (1, 2, 3, 5, 6, 7, 8, 9, 10), 1)
-test_set_X = np.delete(test_set_X, (1, 2, 3, 5, 6, 7, 8, 9, 10), 1)
+train_set_X = np.delete(train_set_X, (1, 2, 3, 5, 6, 7, 8, 9, 10, 11,
+                                      12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28), 1)
+test_set_X = np.delete(test_set_X, (1, 2, 3, 5, 6, 7, 8, 9, 10, 11,
+                                    12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28), 1)
 
 
 # for idx in range(len(train_set_X)):

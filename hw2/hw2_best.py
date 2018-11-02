@@ -5,12 +5,15 @@ import os
 import pandas as pd
 import sys
 
-train_x_file, train_y_file, test_x_file, output_file = 'train_x.csv', 'train_y.csv', 'test_x.csv', '1102_train_result.csv'
+train_x_file, train_y_file, test_x_file, output_file = sys.argv[
+    1], sys.argv[2], sys.argv[3], sys.argv[4]
 
 # train_set_X/train_set_Y/test_set_X are numpy array
 train_set_X = np.array(pd.read_csv(train_x_file, encoding='big5'), dtype=float)
 train_set_Y = np.array(pd.read_csv(train_y_file, encoding='big5'), dtype=float)
 test_set_X = np.array(pd.read_csv(test_x_file, encoding='big5'), dtype=float)
+
+# data normalization
 
 train_set_X = np.append(train_set_X, np.expand_dims(np.mean(
     train_set_X[..., 11:17], axis=1), -1), axis=1)
@@ -78,22 +81,20 @@ test_set_X = one_hot_encoding(test_set_X, 3, 4, 0)
 # PAYMENT one-hot-encoding
 
 for idx in range(5, 11):
+    # for idx in range(5, 8):
     train_set_X = one_hot_encoding(train_set_X, idx, 11, -2)
     test_set_X = one_hot_encoding(test_set_X, idx, 11, -2)
 
+# train_set_X = np.delete(train_set_X, (1, 2, 3, 5, 6, 7, 8, 9, 10), 1)
+# train_set_X = np.delete(train_set_X, (1, 2, 3, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28), 1)
 train_set_X = np.delete(train_set_X, (1, 2, 3, 5, 6, 7, 8, 9, 10, 11,
                                       12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28), 1)
-test_set_X = np.delete(test_set_X, (1, 2, 3, 5, 6, 7, 8, 9, 10, 11,
-                                    12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28), 1)
+# test_set_X = np.delete(test_set_X, (1, 2, 3, 5, 6, 7, 8, 9, 10), 1)
+test_set_X = np.delete(test_set_X, (1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12,
+                                    13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28), 1)
 
 
-# for idx in range(len(train_set_X)):
-#     for i in range(2):
-#         train_set_X[idx]=train_set_X[idx].append([0])
-#     train_set_X[-train_set_X[idx][1]]
-#
-
-# # add bias
+# add bias
 # train_set_X = np.concatenate(
 #     (np.ones((len(train_set_X), 1)), train_set_X), axis=1)
 # test_set_X = np.concatenate(
@@ -104,54 +105,16 @@ def sigmoid(x):
     return 1.0/(1.0+np.exp(-x))
 
 
-weight = np.ones(len(train_set_X[0]))
-ada_sum = np.zeros(len(train_set_X[0]))
-
-
-iteration = 1000
-l_rate = 1e-1
-
-
-for train_iter in range(iteration):
-
-    # test = sigmoid(np.dot(train_set_X, weight)+bias)
-    # print(test.shape)
-    # test = np.expand_dims(test, -1)
-    # print(test.shape)
-    # print(test)
-    # print(train_set_Y.shape)
-    predict = np.array([1 if s >= .5 else 0 for s in sigmoid(
-        np.dot(train_set_X, weight)).transpose()])
-
-    error = predict.transpose() - train_set_Y.transpose()
-    # print(error)
-
-    grad = np.dot(error, train_set_X)[0]/len(train_set_X)
-    # print(grad.shape)
-    ada_sum += grad**2
-    # print(ada_sum.shape)
-    # print(grad)
-    # print(weight)
-    weight -= l_rate*grad/np.sqrt(ada_sum)
-    # print(weight)
-
-    predict = np.array([1 if s >= .5 else 0 for s in sigmoid(
-        np.dot(train_set_X, weight)).transpose()])
-    # print(len(train_set_X))
-    # print(np.sum(np.abs(predict-train_set_Y)))
-    accuracy = 1 - \
-        np.sum(np.abs(predict-train_set_Y.transpose()))/len(train_set_X)
-
-    print('Iteration: %d   accur: %f' % (train_iter, accuracy))
-
-np.save('weight_train.npy', weight)
-
 ans = []
+
+weight = np.load('weight_train_best.npy')
+bias = np.load('bias_train_best.npy')
+
 
 for idx in range(len(test_set_X)):
     ans.append(['id_'+str(idx)])
     predict = [1 if sigmoid(
-        np.dot(test_set_X[idx], weight)).transpose() >= 0.5 else 0]
+        np.dot(test_set_X[idx], weight)+bias).transpose() <= 0.5 else 0]
     ans[idx].append(predict[0])
 
 with open(output_file, 'w+') as output:

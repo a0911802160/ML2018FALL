@@ -18,8 +18,8 @@ from keras.preprocessing import sequence
 import os
 
 
-def seg_preprocess(test_x_file):
-    jieba.load_userdict(sys.argv[2])
+def seg_preprocess(test_x_file, dict_file):
+    jieba.load_userdict(dict_file)
 
     test_X_data = []
 
@@ -148,13 +148,13 @@ def predict(model_path, test_x_data, pred_file_path):
 
 if __name__ == '__main__':
 
-    test_x_file, output_file = sys.argv[1], sys.argv[3]
+    test_x_file, dict_file, output_file = sys.argv[1], sys.argv[2], sys.argv[3]
     word2vec_model_path = 'word2vec.model'
 
-    seg_preprocess(test_x_file)
+    seg_preprocess(test_x_file, dict_file)
     embedding_matrix, word2idx = generate_embedding_matrix(word2vec_model_path)
     test_x_data = generate_X_Y_data(
         'test_X_data.npy', "")
-    test_idx_X = text2idx(test_x_data, word2idx, 128)
+    test_idx_X = text2idx(test_x_data, word2idx, 100)
 
     predict('RNN.h5', test_idx_X, output_file)

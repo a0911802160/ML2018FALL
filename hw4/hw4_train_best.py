@@ -16,8 +16,8 @@ from keras.preprocessing import sequence
 from keras import backend as K
 
 
-def train_word2vec_model(train_x_file, test_x_file):
-    jieba.load_userdict(sys.argv[4])
+def train_word2vec_model(train_x_file, test_x_file, dict_file):
+    jieba.load_userdict(dict_file)
 
     trian_X_data = []
     test_X_data = []
@@ -194,12 +194,12 @@ def text2idx(X_data, word2idx, max_len):
 
 if __name__ == '__main__':
 
-    train_x_file, train_y_file, test_x_file = sys.argv[
-        1], sys.argv[2], sys.argv[3]
+    train_x_file, train_y_file, test_x_file, dict_file = sys.argv[
+        1], sys.argv[2], sys.argv[3], sys.argv[4]
 
     word2vec_model_path = 'word2vec.model'
 
-    train_word2vec_model(train_x_file, test_x_file)
+    train_word2vec_model(train_x_file, test_x_file, dict_file)
     embedding_matrix, word2idx = generate_embedding_matrix(word2vec_model_path)
     train_x_data, train_y_data = generate_X_Y_data(
         'train_X_data.npy', train_y_file)
